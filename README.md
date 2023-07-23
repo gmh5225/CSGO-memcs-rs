@@ -1,5 +1,5 @@
 Status: Rewritten.
 
 todo:
-[] Clean up code
-[] Aimbot
+- [ ] Clean up code
+- [ ] Aimbot
