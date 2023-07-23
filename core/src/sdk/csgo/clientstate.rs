@@ -8,6 +8,8 @@ use crate::{
     },
 };
 
+use super::SignOnState;
+
 pub struct ClientState {
     pub ptr: Address,
 }
@@ -33,13 +35,29 @@ impl ClientState {
     pub fn get_userinfo_table(
         &self,
         ctx: &mut CheatCtx,
-        index: usize,
+        index: i32,
     ) -> Result<PlayerInfo, Error> {
         let offset = ctx.offsets.get_sig("dwClientState_PlayerInfo").unwrap();
         let userinfotable_ptr = ctx.process.read_addr32(self.ptr + offset)?;
         let items_ptr = ctx.process.read_addr32(userinfotable_ptr + 0x40)?;
         let items = ctx.process.read_addr32(items_ptr + 0xC)?;
+        let info = ctx.process.read_addr32(items + 0x28 + (index * 0x34))?;
 
-        Ok(ctx.process.read(items + 0x28 + ((index - 1) * 0x34))?)
+        Ok(PlayerInfo {
+            addr: info
+        })
     }
+
+    pub fn is_ingame(&self, ctx: &mut CheatCtx) -> Result<bool, Error> {
+        let offset = ctx.offsets.get_sig("dwClientState_State")?;
+        let state: i32 = ctx.process.read(self.ptr + offset)?;
+        Ok(state == 6)
+    }
+
+    pub fn get_state(&self, ctx: &mut CheatCtx) -> Result<SignOnState, Error> {
+        let offset = ctx.offsets.get_sig("dwClientState_State")?;
+        let state: i32 = ctx.process.read(self.ptr + offset)?;
+        Ok(num::FromPrimitive::from_i32(state).unwrap())
+    }
+
 }

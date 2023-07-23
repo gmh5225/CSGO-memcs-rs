@@ -27,6 +27,17 @@ pub fn get_glowmanager(ctx: &mut CheatCtx) -> Result<Address, Error> {
     Ok(ctx.process.read_addr32(ctx.client_module.base + offset)?)
 }
 
+pub fn set_model_brightness(ctx: &mut CheatCtx, brightness: f32) -> Result<(), Error> {
+    let offset = ctx.offsets.get_sig("model_ambient_min")?;
+    let offset_as_u32 = offset as u32;
+    let ptr = ctx.engine_module.base.to_umem() as u32 + offset_as_u32 - 0x2c;
+
+    let brightness_as_u32: u32 = brightness.to_bits();
+    let xored: u32 = brightness_as_u32 ^ ptr;
+
+    Ok(ctx.process.write(ctx.engine_module.base + offset, &xored)?)
+}
+
 pub const RANKS: [&str; 19] = [
     "Unranked",
     "Silver I",

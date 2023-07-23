@@ -142,4 +142,24 @@ impl Entity {
             .process
             .read(radar_base + (0x174 * (self.index + 1)) - 0x3C)?)
     }
+
+    pub fn get_entity_list(&self, ctx: &mut CheatCtx) -> Result<Address, Error> {
+        let offset = ctx.offsets.get_sig("dwEntityList")?;
+        Ok(ctx
+            .process
+            .read_addr32(ctx.client_module.base + offset + (self.index * 0x10))?)
+    }
+
+    pub fn get_class_id(&self, ctx: &mut CheatCtx) -> Result<u32, Error> {
+        let ptr1 = ctx.process.read_addr32(self.ptr + 0x8)?;
+        let ptr2 = ctx.process.read_addr32(ptr1 + 2 * 0x4)?;
+        let ptr3 = ctx.process.read_addr32(ptr2 + 0x1)?;
+        Ok(ctx.process.read(ptr3 + 0x14)?)
+    }
+
+    pub fn is_player(&self, ctx: &mut CheatCtx) -> Result<bool, Error> {
+        let class_id = self.get_class_id(ctx)?;
+        log::info!("{}", class_id);
+        Ok(class_id == 40)
+    }
 }

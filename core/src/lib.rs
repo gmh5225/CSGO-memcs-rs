@@ -3,3 +3,6 @@ mod cheat_ctx;
 pub mod sdk;
 
 pub use cheat_ctx::CheatCtx;
+
+#[macro_use]
+extern crate num_derive;

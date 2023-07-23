@@ -14,8 +14,6 @@ impl CheatCtx {
     pub fn setup() -> std::result::Result<CheatCtx, super::sdk::error::Error> {
         let inventory = Inventory::scan();
 
-        println!("{:#?}", inventory.available_connectors());
-
         let os = inventory.builder()
             .connector("qemu")
             .os("win32")
