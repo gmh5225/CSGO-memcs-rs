@@ -1,3 +1,5 @@
-Dependency updates broke everything
+Status: Rewritten.
 
-Need to rewrite this lmao.
+todo:
+- [ ] Clean up code
+- [ ] Aimbot
