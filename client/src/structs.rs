@@ -7,6 +7,7 @@ pub struct Config {
     pub bhop: bool,
     pub radar: bool,
     pub chams: bool,
+    pub fakelag: bool,
 }
 
 #[derive(Clone)]
@@ -58,6 +59,7 @@ pub struct SharedData {
     pub client_base: Option<Address>,
     pub config: Config,
     pub chams_once: bool,
+    pub fakelag_once: bool,
     pub should_exit: bool,
     pub game_state: Option<SignOnState>,
 }
@@ -74,8 +76,10 @@ impl SharedData {
                 bhop: false,
                 radar: false,
                 chams: false,
+                fakelag: false,
             },
             chams_once: false,
+            fakelag_once: false,
             should_exit: false,
             game_state: None,
         }

@@ -5,7 +5,7 @@ use std::{time::Duration, sync::{Mutex, Arc}, thread::JoinHandle};
 
 use memflow::{prelude::MemoryView, types::Address};
 
-use memcs_core::{sdk::{csgo::{Entity, set_model_brightness, SignOnState}, self}, CheatCtx};
+use memcs_core::{sdk::{csgo::{Entity, set_model_brightness, SignOnState, set_send_packet, get_attack}, self}, CheatCtx};
 use simple_file_logger::{init_logger, LogLevel};
 use structs::{SharedData, Color, PlayerInfo};
 
@@ -56,8 +56,15 @@ fn cheat_thread(shared_data: Arc<Mutex<SharedData>>) -> JoinHandle<()> {
                 let local_index = local.get_index(&mut ctx).unwrap();
                 let local_team = local.get_team(&mut ctx).unwrap();
                 let globals = sdk::csgo::get_globalvars(&mut ctx).unwrap();
-    
                 let mut names = vec![PlayerInfo::default(); 64];
+
+                if shared_data.lock().unwrap().config.fakelag {
+                    if globals.tickcount % 16 == 0 {
+                        set_send_packet(&mut ctx, true).unwrap();
+                    } else {
+                        set_send_packet(&mut ctx, false).unwrap();
+                    }
+                }
     
                 for index in 0..globals.max_clients {
                     let entity = Entity::from_index(&mut ctx, index as usize).unwrap();
@@ -114,6 +121,13 @@ fn cheat_thread(shared_data: Arc<Mutex<SharedData>>) -> JoinHandle<()> {
                     set_model_brightness(&mut ctx, 0.0).unwrap();
                     lock.chams_once = false;
                 }
+
+                if lock.config.fakelag {
+                    lock.fakelag_once = true;
+                } else if lock.fakelag_once {
+                    set_send_packet(&mut ctx, true).unwrap();
+                    lock.fakelag_once = false;
+                }
             } else {
                 let mut lock = shared_data.lock().unwrap();
 
@@ -143,10 +157,11 @@ fn cheat_thread(shared_data: Arc<Mutex<SharedData>>) -> JoinHandle<()> {
             }
 
             if lock.should_exit {
-                if !lock.chams_once {
+                if !lock.chams_once && !lock.fakelag_once {
                     break;
                 } else {
                     lock.config.chams = false;
+                    lock.config.fakelag = false;
                 }
             }
 

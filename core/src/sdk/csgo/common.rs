@@ -38,6 +38,17 @@ pub fn set_model_brightness(ctx: &mut CheatCtx, brightness: f32) -> Result<(), E
     Ok(ctx.process.write(ctx.engine_module.base + offset, &xored)?)
 }
 
+pub fn set_send_packet(ctx: &mut CheatCtx, value: bool) -> Result<(), Error> {
+    let offset = ctx.offsets.get_sig("dwbSendPackets")?;
+    let data = if value { 1u8 } else { 0u8 };
+    Ok(ctx.process.write(ctx.engine_module.base + offset, &data )?)
+}
+
+pub fn get_attack(ctx: &mut CheatCtx) -> Result<i32, Error> {
+    let offset = ctx.offsets.get_sig("dwForceAttack")?;
+    Ok(ctx.process.read(ctx.client_module.base + offset)?)
+}
+
 pub const RANKS: [&str; 19] = [
     "Unranked",
     "Silver I",

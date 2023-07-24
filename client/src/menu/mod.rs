@@ -28,7 +28,8 @@ impl Menu {
             settings_list: StatefulList::with_items(vec![
                 (String::from("glow"), false),
                 (String::from("radar"), false),
-                (String::from("chams"), false)
+                (String::from("chams"), false),
+                (String::from("fakelag"), false)
             ])
         }
     }
@@ -103,6 +104,9 @@ pub fn run_menu(shared_data: Arc<Mutex<SharedData>>) -> std::io::Result<()> {
                                 },
                                 2 => {
                                     switch(&mut menu.settings_list.items, &mut lock.config.chams, idx)
+                                },
+                                3 => {
+                                    switch(&mut menu.settings_list.items, &mut lock.config.fakelag, idx)
                                 }
                                 _ => {}
                             }
